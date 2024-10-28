@@ -6,7 +6,7 @@
                     <div class="foot_left">
                         <div class="foot_logo">
                             <img src="../../assets/img/home/logo.png" alt="">
-                            <h2>哔哩哔哩漫画</h2>
+                            <h2>C漫画</h2>
                         </div>
                         <div class="foot_wrap">
                             <ul class="foot_list">
