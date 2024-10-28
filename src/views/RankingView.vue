@@ -1,59 +1,3 @@
-<script>
-// import ran_con from '@/components/ranking/rankingCom.vue'
-import { getRankingData } from '@/api/ranking';
-import { getRankComData } from "@/api/ranking_com";
-import { ref } from 'vue';
-
-export default {
-    setup() {
-        const loading = ref(true)
-        // let state = reactive({
-        //     id: 7
-        // })
-        // let id = toRef(state, 'id');
-        let id = ref(7);
-        let list = ref([]);
-        let rankTitleData = ref([]);
-        let list1 = ref([]);
-
-
-        // 数据请求
-        // 右边 -- 标题
-        getRankingData().then(data => {
-            console.log(data.data.list);
-            list.value = data.data.list;
-            loading.value = false;
-        })
-        // 左边 -- 内容
-        getRankComData(id.value).then(data => {
-            console.log(data.data.list);
-            list1.value = data.data.list;
-        })
-
-        // 事件方法
-        function change(item_id) {
-            loading.value = true;
-            id.value = item_id;
-            getRankComData(id.value).then(data => {
-                list1.value = data.data.list;
-                loading.value = false;
-                console.log(list1.value);
-            })
-        }
-
-        return {
-            id,
-            list,
-            rankTitleData,
-            list1,
-            // 事件方法
-            change,
-            loading
-        }
-    }
-}
-</script>
-
 <template>
     <div class="ranking">
         <div class="container">
@@ -69,7 +13,6 @@ export default {
                     </a>
                 </div>
             </div>
-            <!-- <ran_con /> -->
             <!-- 左边 -- 内容 -->
             <div class="ranking_content">
                 <!-- 解决图片有反盗链 -->
@@ -87,15 +30,11 @@ export default {
                         element-loading-text="疯狂加载中......">
                         <div class="rank_item" v-for="(item, index) in list1" :key="index">
                             <div class="rank_num">
-                                <!-- <div class="num_item" >
-                                                <img src="" alt="">
-                                            </div> -->
                                 <p>{{ index + 1 < 10 ? '0' + (index + 1) : index + 1 }}</p>
                             </div>
                             <div class="rank_movement"></div>
                             <div class="rank_item_content ">
                                 <router-link class="content_img" :to="'/detailspage?id=' + item.comic_id">
-                                    <!-- 漫画图片 -->
                                     <div class="content_img_item">
                                         <el-image :src="item.vertical_cover" alt="" lazy />
                                     </div>
@@ -123,7 +62,50 @@ export default {
     </div>
 </template>
 
+<script>
+import { getRankingData } from '@/api/ranking';
+import { getRankComData } from "@/api/ranking_com";
+import { ref } from 'vue';
 
+export default {
+    setup() {
+        const loading = ref(true);
+        let id = ref(7);
+        let list = ref([]);
+        let list1 = ref([]);
+
+        // 数据请求
+        getRankingData().then(data => {
+            console.log(data.data.list);
+            list.value = data.data.list;
+            loading.value = false;
+        });
+        getRankComData(id.value).then(data => {
+            console.log(data.data.list);
+            list1.value = data.data.list;
+        });
+
+        // 事件方法
+        function change(item_id) {
+            loading.value = true;
+            id.value = item_id;
+            getRankComData(id.value).then(data => {
+                list1.value = data.data.list;
+                loading.value = false;
+                console.log(list1.value);
+            })
+        }
+
+        return {
+            id,
+            list,
+            list1,
+            change,
+            loading
+        }
+    }
+}
+</script>
 
 <style lang="scss" scoped>
 ::v-deep .el-loading-spinner {
@@ -155,6 +137,8 @@ export default {
     margin-bottom: 8px;
     flex-direction: column;
     border-right: 1px solid #e0e0e0;
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 0.5px;
 
     a:hover {
         color: #ff0066;
@@ -163,6 +147,7 @@ export default {
     a.con {
         color: #ff0066;
         position: relative;
+        font-weight: bold;
 
         span.nav_triangle::after {
             content: "";
@@ -188,6 +173,9 @@ export default {
         flex-wrap: wrap;
         margin-bottom: -32px;
         margin-top: 9px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
     }
 
     .rank_title {
@@ -195,9 +183,9 @@ export default {
 
         .rank_name {
             margin: 0;
-            font-size: 24px;
+            font-size: 28px;
             color: rgba(0, 0, 0, .87);
-            font-weight: 400;
+            font-weight: 500;
             display: inline-block;
         }
 
@@ -214,10 +202,15 @@ export default {
 .rank_item {
     width: 31%;
     height: 156px;
-    margin: 0 16px 32px 0;
+    margin: 16px 16px 32px 0;
     padding: 20px 0 0 46px;
     position: relative;
     box-sizing: border-box;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
 
     .rank_num {
         position: absolute;
@@ -225,7 +218,6 @@ export default {
         left: 14px;
 
         .num_item {
-            // display: inline-block;
             width: 40px;
             height: 64px;
             background: no-repeat 50%;
@@ -246,13 +238,15 @@ export default {
     }
 
     .rank_item_content {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
         position: relative;
         height: 136px;
 
         &>.content_img {
             display: block;
             width: 102px;
-            // height: 100%;
             float: left;
 
             .content_img_item {
@@ -275,9 +269,6 @@ export default {
             box-sizing: border-box;
             position: relative;
             height: 100%;
-            // overflow: hidden;
-            // white-space: nowrap;
-            // text-overflow: ellipsis;
 
             .manga_text {
                 font-size: 18px;
@@ -303,6 +294,12 @@ export default {
                 }
             }
         }
+    }
+}
+
+@media (max-width: 768px) {
+    .rank_item {
+        width: 48%;
     }
 }
 </style>
